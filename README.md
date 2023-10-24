@@ -17,5 +17,5 @@ Once everything is setup :
 ***
 ## 🚀 2 - Commands
 
-- Run in development : `quasar d`
-- Build : `quasar b`
+- Run in development : `quasar d -m ssr`
+- Build : `quasar b -m ssr`
