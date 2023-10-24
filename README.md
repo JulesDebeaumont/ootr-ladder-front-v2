@@ -13,9 +13,11 @@ Once everything is setup :
 - Clone the project
 - Run `npm install`
 - Create /.env file (exemple in the /.env-example)
+- Update the quasar.config.js ssr->prodPort if needed.
 
 ***
 ## 🚀 2 - Commands
 
 - Run in development : `quasar d -m ssr`
 - Build : `quasar b -m ssr`
+- Run for prod : `quasar serve`
