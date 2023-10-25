@@ -14,10 +14,10 @@ export const useUserStore = defineStore('user', {
       return this.discordProfil !== null;
     },
     isAdmin(): boolean {
-      return this.isConnected && this.discordProfil?.profile === 'admin';
+      return this.isConnected && this.user?.profile === 'admin';
     },
     isOldDiscordUser(): boolean {
-      return this.discordProfil?.discriminator === '0';
+      return this.discordProfil?.discriminator !== '0';
     },
   },
   actions: {
@@ -56,13 +56,13 @@ export const useUserStore = defineStore('user', {
           this.discordProfil = responseDiscordProfile.data;
           const username = this.isOldDiscordUser
             ? `${this.discordProfil?.username}#${this.discordProfil?.discriminator}`
-            : `${this.discordProfil?.global_name}`;
+            : `${this.discordProfil?.username}`;
           try {
             const responseUserProfile = await api.get(`player/${username}`);
             this.user = responseUserProfile.data;
             this.hasRegister = true;
           } catch (error: any) {
-            if (error.response.status === 404) {
+            if ((error.response?.status ?? 0) === 404) {
               this.hasRegister = false;
             }
             console.error(error);

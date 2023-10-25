@@ -268,8 +268,9 @@ onMounted(async () => {
         :pagination="{ rowsPerPage: 1000 }"
         class="full-width"
         row-key="id"
+        no-data-label="No race found"
         style="background-color: var(--q-leaderboard-bg)"
-        hide-bottom
+        hide-pagination
       >
         <template v-slot:header="props">
           <q-tr :props="props" class="bg-secondary text-uppercase">

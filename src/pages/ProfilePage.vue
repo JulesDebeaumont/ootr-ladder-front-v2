@@ -33,7 +33,7 @@ async function getMyProfile() {
     const ladderProfile = await api.get(`player/${userStoreUserName.value}`);
     profile.value = ladderProfile?.data ?? null;
   } catch (error: any) {
-    if (error.response?.status === 404) {
+    if ((error.response?.status ?? 0) === 404) {
       myProfileNotFound.value = true;
       userStore.hasRegister = false;
     } else {
@@ -52,7 +52,7 @@ async function getProfileByUsername(username: string) {
     );
     profile.value = userProfile?.data ?? null;
   } catch (error: any) {
-    if (error.response?.status === 404) {
+    if ((error.response?.status ?? 0) === 404) {
       profileNotFound.value = true;
     } else {
       console.error(error);
@@ -65,9 +65,7 @@ async function getProfileByUsername(username: string) {
 async function getRacesByUsername(username: string) {
   isLoading.value = true;
   try {
-    const sessionResponse = await api.get(
-      `player/${formatDiscordUsername(username)}/races`
-    );
+    const sessionResponse = await api.get(`player/${formatDiscordUsername(username)}/races`);
     profilesRaces.value = sessionResponse.data;
   } catch (error) {
     console.error(error);
@@ -79,10 +77,10 @@ async function getRacesByUsername(username: string) {
 async function getAchievementsByUsername(username: string) {
   isLoading.value = true;
   try {
-    const achievementsresponse = await api.get(
+    const achievementsResponse = await api.get(
       `player/${formatDiscordUsername(username)}/achievements`
     );
-    const achievements = achievementsresponse.data as IAchievement[];
+    const achievements = achievementsResponse.data as IAchievement[];
     let achievementsDone = achievements.filter((achievFilter) => {
       return achievFilter.active === true;
     });
@@ -120,7 +118,7 @@ function openTwitchLink(username: string) {
 const userStoreUserName = computed(() => {
   return userStore.isOldDiscordUser
     ? `${userStore.discordProfil?.username}#${userStore.discordProfil?.discriminator}`
-    : `${userStore.discordProfil?.global_name}`;
+    : `${userStore.discordProfil?.username}`;
 });
 
 // watchs
@@ -143,7 +141,7 @@ onMounted(async () => {
     if (userStore.hasSetupProfile === true) {
       await getMyProfile();
       if (myProfileNotFound.value === false) {
-        await getRacesByUsername(userStoreUserName.value);
+        await getRacesByUsername(userStoreUserName.value); 
         await getAchievementsByUsername(userStoreUserName.value);
       }
     }
@@ -157,7 +155,7 @@ onMounted(async () => {
       <div class="flex row no-wrap item-center q-gutter-x-md q-pb-xl">
         <q-avatar style="height: 100px; width: 100px">
           <q-img
-            src="https://cdn.discordapp.com/avatars/338709555380879360/508850a34bd8f2fafb3d52f1cbe89358.png"
+            :src="profile.avatarUrl ?? '/images/triforce.png'"
           />
         </q-avatar>
         <div class="flex column q-pt-md">

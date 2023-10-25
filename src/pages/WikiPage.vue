@@ -179,6 +179,12 @@ function cancelEditMode() {
   if (wiki.value === null) {
     return;
   }
+  if (selectedWiki.value === null) {
+    selectedWiki.value = wikiTypes.value.at(0) ?? null;
+    if (selectedWiki.value !== null) {
+      getWikiByType(selectedWiki.value);
+    }
+  }
   if (backupWikiForCancel.value !== null) {
     wiki.value = backupWikiForCancel.value;
     backupWikiForCancel.value = null;
@@ -236,7 +242,11 @@ onMounted(async () => {
       <q-card
         v-if="wiki !== null"
         class="flex flex-center column markdown-display q-pa-lg"
-        style="background-color: var(--q-leaderboard-bg)"
+        style="
+          background-color: var(--q-leaderboard-bg);
+          max-width: 650px;
+          width: 100%;
+        "
       >
         <q-dialog v-model="dialogDeleteWiki">
           <DelayedCard
@@ -296,7 +306,7 @@ onMounted(async () => {
           </template>
         </span>
         <template v-if="editMode">
-          <q-intersection once transition="fade">
+          <q-intersection once transition="fade" class="full-width">
             <q-input
               v-model="wiki.title"
               filled
@@ -307,10 +317,8 @@ onMounted(async () => {
               v-model="wiki.markdownBody"
               label="Content"
               type="textarea"
-              class="q-mr-md"
               autogrow
               filled
-              style="max-width: 650px; width: 100%"
             />
           </q-intersection>
         </template>
@@ -318,7 +326,6 @@ onMounted(async () => {
         <div
           v-show="!editMode"
           v-html="markdownToHtml(wiki.markdownBody)"
-          style="max-width: 650px; width: 100%"
         ></div>
         <hr class="hidden" />
       </q-card>

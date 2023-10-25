@@ -87,7 +87,6 @@ onMounted(async () => {
 
 <template>
   <div class="full-width">
-    {{ userStore.user }}
     <div v-if="(schedules?.length ?? 0) > 0">
       <q-intersection once transition="fade">
         <q-table

@@ -41,7 +41,7 @@ export default ssrMiddleware(async ({ app, resolve }) => {
         res.cookie('tokenData', null, { expires: new Date(Date.now() + 0), httpOnly: true }).status(200).json();
         return;
       } catch (error: any) {
-        if (error.response.status === 404) {
+        if ((error.response?.status ?? 0) === 404) {
           res.status(404).json();
           return;
         }

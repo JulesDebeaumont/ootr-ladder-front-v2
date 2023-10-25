@@ -41,7 +41,7 @@ export default ssrMiddleware(async ({ app, resolve }) => {
         res.cookie('tokenData', tokenData, { expires: new Date(Date.now() + 36_000_000 /* 10H */), httpOnly: true }).redirect('/profile')
         return
       } catch (error: any) {
-        if (error.response.status === 404) {
+        if ((error.response?.status ?? 0) === 404) {
           res.status(404).json()
           return
         }

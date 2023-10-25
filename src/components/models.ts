@@ -71,12 +71,11 @@ export interface IUser {
   refreshToken?: string;
   isLoggedIn?: boolean;
   pronoun?: string;
-  profile?: string;
   global_name?: string;
 }
 export interface IUserProfile {
   id: number;
-  admin: 'admin' | null;
+  profile?: 'admin';
   name: string;
   discordName: string;
   discordId: number;

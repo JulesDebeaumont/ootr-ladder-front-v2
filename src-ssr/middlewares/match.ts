@@ -38,7 +38,7 @@ export default ssrMiddleware(async ({ app, resolve }) => {
         res.status(200).json(matchInfo.data);
         return;
       } catch (error: any) {
-        if (error.response.status === 404) {
+        if ((error.response?.status ?? 0) === 404) {
           res.status(404).json()
           return
         }

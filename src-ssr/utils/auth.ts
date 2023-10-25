@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IUser } from 'src/components/models';
+import { IUser, IUserProfile } from 'src/components/models';
 
 export async function getDiscordUser(cookie?: string) {
   if (!cookie) {
@@ -37,7 +37,7 @@ export async function getUserProfile(userUsername: string) {
   const userProfile = await axios.get(
     `${process.env.LADDER_BOT_HOSTNAME}/player/${userUsername}`
   );
-  return userProfile.data as IUser;
+  return userProfile.data as IUserProfile;
 }
 
 export async function isUserAdmin(cookie?: string) {
@@ -45,7 +45,7 @@ export async function isUserAdmin(cookie?: string) {
   if (!user) {
     return false;
   }
-  const userUsername = user.discriminator === '0' ? user.global_name as string : `${user.username}#${user.discriminator}`
+  const userUsername = user.discriminator === '0' ? user.username as string : `${user.username}#${user.discriminator}`
   const profileUser = await getUserProfile(userUsername);
   return profileUser.profile === 'admin';
 }

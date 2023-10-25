@@ -59,7 +59,7 @@ function openDiscordLink() {
 }
 async function logout() {
   await userStore.logout();
-  if (route.name === 'profile') {
+  if (route.name === 'my-profile') {
     router.push({ name: 'schedule' });
   }
 }
@@ -236,7 +236,7 @@ onMounted(async () => {
                 <q-item clickable>
                   <q-item-section>
                     <q-item-label @click="router.push({ name: 'my-profile' })">
-                      <template v-if="userStore.isOldDiscordUser">
+                      <template v-if="!userStore.isOldDiscordUser">
                         {{ userStore.discordProfil?.global_name }}
                       </template>
                       <template v-else>
