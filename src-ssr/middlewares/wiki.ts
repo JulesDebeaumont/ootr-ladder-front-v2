@@ -14,7 +14,7 @@ export default ssrMiddleware(async ({ app, resolve }) => {
   app.use(bodyParser.json());
   app.all(resolve.urlPath('*'), async (req, res, next) => {
     if (req.url.startsWith('/' + process.env.URL_SEGMENT_FOR_WIKI)) {
-      const wikiPath = './data/wiki';
+      const wikiPath = process.env.WIKI_MARKDOWN_FOLDER_PATH ?? '';
       const wikiFileExtension = '.md';
       const typeParam = req.query['type'];
       try {

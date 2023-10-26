@@ -21,3 +21,4 @@ Once everything is setup :
 - Run in development : `quasar d -m ssr`
 - Build : `quasar b -m ssr`
 - Run for prod : `quasar serve`
+- For production only, move the data/wiki/ folder in the dist/ssr/ folder
