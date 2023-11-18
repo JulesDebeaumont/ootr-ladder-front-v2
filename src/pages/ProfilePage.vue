@@ -2,7 +2,13 @@
 import { watch, ref, toRef, onMounted, computed } from 'vue';
 import { notifyError } from 'src/utils/notify';
 import { api } from 'src/boot/axios';
-import { IUserProfile, IAchievement, IRace } from 'src/components/models';
+import {
+  IUserProfile,
+  IAchievement,
+  IRace,
+  ICacheAchievementData,
+  IAchievementData,
+} from 'src/components/models';
 import { useUserStore } from 'src/stores/user-store';
 import { useRoute } from 'vue-router';
 // components
@@ -25,6 +31,9 @@ const storeHasCheckProfile = toRef(userStore, 'hasSetupProfile');
 const isMyProfileMode = ref(true);
 const profileNotFound = ref(false);
 const infosMode = ref(infosType.at(0));
+const achievementTypes = ref<string[]>([])
+const achievementTypeSelected = ref('')
+const filteredAchievement = ref<IAchievement[]>([])
 
 // functions
 async function getMyProfile() {
@@ -65,7 +74,9 @@ async function getProfileByUsername(username: string) {
 async function getRacesByUsername(username: string) {
   isLoading.value = true;
   try {
-    const sessionResponse = await api.get(`player/${formatDiscordUsername(username)}/races`);
+    const sessionResponse = await api.get(
+      `player/${formatDiscordUsername(username)}/races`
+    );
     profilesRaces.value = sessionResponse.data;
   } catch (error) {
     console.error(error);
@@ -77,10 +88,22 @@ async function getRacesByUsername(username: string) {
 async function getAchievementsByUsername(username: string) {
   isLoading.value = true;
   try {
+    const achievementsData = (
+      await api(
+        `${process.env.DOMAIN}/${process.env.URL_SEGMENT_FOR_ACHIEVEMENT}`
+      )
+    ).data as IAchievementData[];
     const achievementsResponse = await api.get(
       `player/${formatDiscordUsername(username)}/achievements`
     );
     const achievements = achievementsResponse.data as IAchievement[];
+    for (let i = 0; i < achievements.length; i++) {
+      achievements[i].achievementData = achievementsData.find(
+        (achievementData) => {
+          return achievementData.code === achievements[i].code;
+        }
+      );
+    }
     let achievementsDone = achievements.filter((achievFilter) => {
       return achievFilter.active === true;
     });
@@ -97,6 +120,7 @@ async function getAchievementsByUsername(username: string) {
       );
     });
     profileAchievements.value = achievementsDone.concat(achievementsUndone);
+    setupAchievementsType()
   } catch (error) {
     console.error(error);
     notifyError();
@@ -112,6 +136,22 @@ function openDiscordLink() {
 }
 function openTwitchLink(username: string) {
   window.open(`https://www.twitch.tv/${username}`, '_blank')?.focus();
+}
+function setupAchievementsType() {
+  if (profileAchievements.value === null) {
+    return
+  }
+  achievementTypes.value = [...new Set(profileAchievements.value.map((achievement) => achievement.ladderType))]
+  filterAchievementByType(achievementTypes.value.at(0) ?? '')
+}
+function filterAchievementByType(achievementType: string) {
+  if (profileAchievements.value === null) {
+    return
+  }
+  achievementTypeSelected.value = achievementType
+  filteredAchievement.value = profileAchievements.value.filter((achievementFilter) => {
+    return achievementFilter.ladderType === achievementTypeSelected.value
+  })
 }
 
 // computeds
@@ -141,7 +181,7 @@ onMounted(async () => {
     if (userStore.hasSetupProfile === true) {
       await getMyProfile();
       if (myProfileNotFound.value === false) {
-        await getRacesByUsername(userStoreUserName.value); 
+        await getRacesByUsername(userStoreUserName.value);
         await getAchievementsByUsername(userStoreUserName.value);
       }
     }
@@ -154,9 +194,7 @@ onMounted(async () => {
     <div v-if="profile" class="full-width flex flex-center column">
       <div class="flex row no-wrap item-center q-gutter-x-md q-pb-xl">
         <q-avatar style="height: 100px; width: 100px">
-          <q-img
-            :src="profile.avatarUrl ?? '/images/triforce.png'"
-          />
+          <q-img :src="profile.avatarUrl ?? '/images/triforce.png'" />
         </q-avatar>
         <div class="flex column q-pt-md">
           <div class="text-h4 text-dark-bis">{{ profile.name }}</div>
@@ -199,17 +237,32 @@ onMounted(async () => {
       </q-intersection>
 
       <template v-if="profileAchievements && infosMode === infosType.at(0)">
+        <q-intersection once transition="fade">
+        <div class="flex-center row no-wrap q-gutter-x-md q-pb-md full-width">
+          <q-btn
+            v-for="achievType in achievementTypes"
+            @click="filterAchievementByType(achievType)"
+            :key="achievType"
+            :label="achievType"
+            :color="achievType === achievementTypeSelected ? 'accent' : 'primary'"
+            text-color="dark-bis"
+          />
+        </div>
+      </q-intersection>
         <q-card class="bg-leaderboard" style="max-width: 600px; width: 100%">
-          <q-list
+          <q-intersection
+            once
+            transition="fade"
             v-if="isLoading === false && profileAchievements.length > 0"
-            separator
           >
-            <AchievementItem
-              v-for="achievement in profileAchievements"
-              :achievement="achievement"
-              :key="achievement.id"
-            />
-          </q-list>
+            <q-list separator>
+              <AchievementItem
+                v-for="achievement in filteredAchievement"
+                :achievement="achievement"
+                :key="achievement.id"
+              />
+            </q-list>
+          </q-intersection>
           <div v-else class="text-body1 text-center">No achievement.</div>
         </q-card>
       </template>

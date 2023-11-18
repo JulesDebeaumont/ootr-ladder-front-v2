@@ -41,6 +41,9 @@ async function getWikiTypes() {
   }
 }
 async function getWikiByType(wikiType: string) {
+  if (selectedWiki.value === wikiType) {
+    return
+  }
   isLoading.value = true;
   selectedWiki.value = wikiType;
   try {

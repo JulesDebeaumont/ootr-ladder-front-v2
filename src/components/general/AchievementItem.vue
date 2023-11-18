@@ -28,18 +28,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-intersection once transition="fade">
     <q-item clickable>
       <q-item-section>
         <q-item-label
+          class="text-body2"
           :class="props.achievement.active ? 'text-dark-bis' : 'text-grey-6'"
-          >{{ props.achievement?.code }}
+          >{{ props.achievement?.achievementData?.name }}
         </q-item-label>
         <q-item-label
           caption
-          :class="props.achievement.active ? 'text-grey-4' : 'text-grey-8'"
+          :class="props.achievement.active ? 'text-grey-5' : 'text-grey-9'"
           class="text-weight-medium"
-          >{{ props.achievement?.description }}</q-item-label
+          >{{ props.achievement?.achievementData?.condition }}</q-item-label
         >
         <div class="flex row no-wrap items-center">
           <q-linear-progress
@@ -54,5 +54,4 @@ onMounted(() => {
         </div>
       </q-item-section>
     </q-item>
-  </q-intersection>
 </template>

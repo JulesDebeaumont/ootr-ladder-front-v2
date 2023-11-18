@@ -87,7 +87,6 @@ export interface IUserProfile {
 }
 export interface IAchievement {
   id: number;
-  name: string;
   description: string;
   points: number;
   code: string;
@@ -101,4 +100,18 @@ export interface IAchievement {
     prog: number;
   } | null;
   active: boolean;
+  achievementData?: IAchievementData;
+}
+export interface IAchievementData {
+  name?: string;
+  condition: string;
+  code: string;
+  isSeasonal: boolean;
+  isUnique: boolean;
+  ladders: string[];
+  title: string;
+}
+export interface ICacheAchievementData {
+  fetchedOn: Date;
+  data: IAchievementData[];
 }
